@@ -2,7 +2,9 @@ package com.kutsyk.upgrader;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.io.CopyStreamAdapter;
 
+import javax.swing.*;
 import java.io.*;
 import java.util.Scanner;
 
@@ -57,6 +59,7 @@ public class Upgrader {
         if(downloadNewerVersion()) {
             deleteOldVersion();
             renameNewerVersion();
+            return true;
         }
         return false;
     }
@@ -73,7 +76,7 @@ public class Upgrader {
         return new File(filePath+"program.jar").renameTo(new File(filePath+"LaTEX.jar"));
     }
 
-    private boolean downloadFileFromFTP(String remote, File local) {
+    private boolean downloadFileFromFTP(String remote, final File local) {
         boolean success = false;
         try {
             ftpClient.connect(server, port);
@@ -81,6 +84,7 @@ public class Upgrader {
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
+            long fileSize = ftpClient.mlistFile(remote).getSize();
             if (!local.exists())
                 local.createNewFile();
 
@@ -88,8 +92,12 @@ public class Upgrader {
             InputStream inputStream = ftpClient.retrieveFileStream(remote);
             byte[] bytesArray = new byte[4096];
             int bytesRead = -1;
+            long totalBytesRead=0, percentCompleted=0;
             while ((bytesRead = inputStream.read(bytesArray)) != -1) {
                 outputStream2.write(bytesArray, 0, bytesRead);
+                totalBytesRead += bytesRead;
+                percentCompleted = (int) (totalBytesRead * 100 / fileSize);
+                System.out.println(percentCompleted+"%");
             }
 
             success = ftpClient.completePendingCommand();
