@@ -14,6 +14,7 @@ import java.util.Scanner;
 public class Upgrader {
 
     private int currentVersion = -1;
+    private int versionOnFTP = -1;
     private String server = "ftp.charlesworth-group.com";
     private int port = 21;
     private String user = "guest";
@@ -23,7 +24,7 @@ public class Upgrader {
 
     public Upgrader(String mainPath) {
         filePath = mainPath;
-        currentVersion = getVersionFromFile(".currVersion");
+        currentVersion = getVersionFromFile(filePath+"/bin/.currVersion");
     }
 
     public boolean upgrade() {
@@ -32,15 +33,14 @@ public class Upgrader {
         return false;
     }
 
-    private boolean existNewVersion() {
-        int versionOnFTP = -1;
+    public boolean existNewVersion() {
         if (downloadVersionFile())
-            versionOnFTP = getVersionFromFile(".version");
+            versionOnFTP = getVersionFromFile(filePath+"/bin/.version");
         return versionOnFTP > currentVersion;
     }
 
     public boolean downloadVersionFile() {
-        return downloadFileFromFTP("/software/.version", new File(filePath+".version"));
+        return downloadFileFromFTP("/software/.version", new File(filePath+"/bin/.version"));
     }
 
     private int getVersionFromFile(String fileName) {
@@ -59,21 +59,33 @@ public class Upgrader {
         if(downloadNewerVersion()) {
             deleteOldVersion();
             renameNewerVersion();
+            updateVersionNumber();
             return true;
         }
         return false;
     }
 
     private boolean downloadNewerVersion() {
-        return downloadFileFromFTP("/software/program.jar", new File(filePath+"program.jar"));
+        return downloadFileFromFTP("/software/program.jar", new File(filePath+"/bin/program.jar"));
     }
 
     private boolean deleteOldVersion(){
-        return new File(filePath+"LaTEX.jar").delete();
+        return new File(filePath+"/bin/LaTEX.jar").delete();
     }
 
     private boolean renameNewerVersion(){
-        return new File(filePath+"program.jar").renameTo(new File(filePath+"LaTEX.jar"));
+        return new File(filePath+"/bin/program.jar").renameTo(new File(filePath+"bin/LaTEX.jar"));
+    }
+
+    public void updateVersionNumber(){
+        try {
+            currentVersion = versionOnFTP;
+            PrintWriter writer = new PrintWriter(new File(filePath+"/bin/.currVersion"));
+            writer.append(""+currentVersion);
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean downloadFileFromFTP(String remote, final File local) {
