@@ -2,7 +2,6 @@ package com.kutsyk.upgrader;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.io.CopyStreamAdapter;
 
 import javax.swing.*;
 import java.io.*;
@@ -11,7 +10,7 @@ import java.util.Scanner;
 /**
  * Created by Kutsyk on 27.05.2015.
  */
-public class Upgrader {
+public class Updater {
 
     private int currentVersion = -1;
     private int versionOnFTP = -1;
@@ -20,11 +19,13 @@ public class Upgrader {
     private String user = "guest";
     private String pass = "guest99";
     private FTPClient ftpClient = new FTPClient();
-    private String filePath;
+    private String mainPath;
+    private JProgressBar progress;
 
-    public Upgrader(String mainPath) {
-        filePath = mainPath;
-        currentVersion = getVersionFromFile(filePath+"/bin/.currVersion");
+    public Updater(String mainPath, JProgressBar progress) {
+        this.progress = progress;
+        this.mainPath = mainPath;
+        currentVersion = getVersionFromFile(mainPath + "/bin/.currVersion");
     }
 
     public boolean upgrade() {
@@ -35,12 +36,12 @@ public class Upgrader {
 
     public boolean existNewVersion() {
         if (downloadVersionFile())
-            versionOnFTP = getVersionFromFile(filePath+"/bin/.version");
+            versionOnFTP = getVersionFromFile(mainPath + "/bin/.version");
         return versionOnFTP > currentVersion;
     }
 
     public boolean downloadVersionFile() {
-        return downloadFileFromFTP("/software/.version", new File(filePath+"/bin/.version"));
+        return downloadFileFromFTP("/software/.version", new File(mainPath + "/bin/.version"));
     }
 
     private int getVersionFromFile(String fileName) {
@@ -56,7 +57,7 @@ public class Upgrader {
     }
 
     private boolean replaceCurrentVersionWithNew() {
-        if(downloadNewerVersion()) {
+        if (downloadNewerVersion()) {
             deleteOldVersion();
             renameNewerVersion();
             updateVersionNumber();
@@ -66,22 +67,22 @@ public class Upgrader {
     }
 
     private boolean downloadNewerVersion() {
-        return downloadFileFromFTP("/software/program.jar", new File(filePath+"/bin/program.jar"));
+        return downloadFileFromFTP("/software/program.jar", new File(mainPath + "/bin/program.jar"));
     }
 
-    private boolean deleteOldVersion(){
-        return new File(filePath+"/bin/LaTEX.jar").delete();
+    private boolean deleteOldVersion() {
+        return new File(mainPath + "/bin/LaTEX.jar").delete();
     }
 
-    private boolean renameNewerVersion(){
-        return new File(filePath+"/bin/program.jar").renameTo(new File(filePath+"bin/LaTEX.jar"));
+    private boolean renameNewerVersion() {
+        return new File(mainPath + "/bin/program.jar").renameTo(new File(mainPath + "bin/LaTEX.jar"));
     }
 
-    public void updateVersionNumber(){
+    public void updateVersionNumber() {
         try {
             currentVersion = versionOnFTP;
-            PrintWriter writer = new PrintWriter(new File(filePath+"/bin/.currVersion"));
-            writer.append(""+currentVersion);
+            PrintWriter writer = new PrintWriter(new File(mainPath + "/bin/.currVersion"));
+            writer.append("" + currentVersion);
             writer.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -104,12 +105,12 @@ public class Upgrader {
             InputStream inputStream = ftpClient.retrieveFileStream(remote);
             byte[] bytesArray = new byte[4096];
             int bytesRead = -1;
-            long totalBytesRead=0, percentCompleted=0;
+            long totalBytesRead = 0, percentCompleted = 0;
             while ((bytesRead = inputStream.read(bytesArray)) != -1) {
                 outputStream2.write(bytesArray, 0, bytesRead);
                 totalBytesRead += bytesRead;
                 percentCompleted = (int) (totalBytesRead * 100 / fileSize);
-                System.out.println(percentCompleted+"%");
+                progress.setValue((int) percentCompleted);
             }
 
             success = ftpClient.completePendingCommand();

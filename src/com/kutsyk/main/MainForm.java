@@ -1,134 +1,224 @@
 package com.kutsyk.main;
 
-import com.kutsyk.upgrader.Upgrader;
+import com.kutsyk.upgrader.Updater;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.GroupLayout;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
 /*
  * Created by JFormDesigner on Wed May 27 20:41:17 MSD 2015
  */
 
 
-
 /**
  * @author Vasyl Kutsyk
  */
-public class MainForm extends JFrame {
-	public MainForm() {
-		initComponents();
-	}
+public class MainForm extends JFrame implements PropertyChangeListener{
 
-	private void okButtonActionPerformed(ActionEvent e) {
-        Upgrader upgrader = new Upgrader(System.getProperty("user.dir"));
-        upgrader.upgrade();
-	}
+    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+    // Generated using JFormDesigner Evaluation license - Vasyl Kutsyk
+    private JPanel dialogPane;
+    private JButton cancelButton;
+    private JButton okButton;
+    private JButton updateButton;
+    private JLabel label2;
+    private JLabel label3;
+    private JProgressBar progressBar1;
+    private JLabel infoLabel;
 
-	private void cancelButtonActionPerformed(ActionEvent e) {
-		System.exit(1);
-	}
+    private String userDir = System.getProperty("user.dir");
+    private Updater updater;
 
-	private void initComponents() {
-		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-		// Generated using JFormDesigner Evaluation license - Vasyl Kutsyk
-		dialogPane = new JPanel();
-		contentPanel = new JPanel();
-		label1 = new JLabel();
-		buttonBar = new JPanel();
-		okButton = new JButton();
-		cancelButton = new JButton();
+    public MainForm() {
+        initComponents();
+        initUpdatingSystem();
+//        initUpdateButton();
+    }
 
-		//======== this ========
-		setTitle("LaTeXtoXML");
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		Container contentPane = getContentPane();
-		contentPane.setLayout(new BorderLayout());
+    private void initUpdatingSystem(){
+        updater = new Updater(userDir, progressBar1);
+        infoLabel.setText("Checking for new version...");
+        progressBar1.setIndeterminate(true);
+    }
 
-		//======== dialogPane ========
-		{
-			dialogPane.setBorder(new EmptyBorder(12, 12, 12, 12));
+    public void initUpdateButton(){
+        boolean newer = updater.existNewVersion();
+        updateButton.setEnabled(newer);
+        progressBar1.setIndeterminate(false);
+    }
 
-			// JFormDesigner evaluation mark
+    private void okButtonActionPerformed(ActionEvent e) {
+        try {
+            Runtime.getRuntime().exec("java -jar " + userDir + "/bin/program.jar");
+            System.exit(1);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    private void cancelButtonActionPerformed(ActionEvent e) {
+        System.exit(1);
+    }
+
+    private void updateButtonActionPerformed(ActionEvent e) {
+//        Thread updaterThread = new Thread(new Runnable() {
+//            public void run() {
+                updater.upgrade();
+//            }
+//        });
+//        updaterThread.start();
+        JOptionPane.showMessageDialog(this, "Upgraded. Please, restart the proogram");
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if ("progress" == evt.getPropertyName()) {
+            int progress = (Integer) evt.getNewValue();
+            progressBar1.setValue(progress);
+        }
+    }
+
+    private void initComponents() {
+        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+        // Generated using JFormDesigner Evaluation license - Vasyl Kutsyk
+        dialogPane = new JPanel();
+        cancelButton = new JButton();
+        okButton = new JButton();
+        updateButton = new JButton();
+        label2 = new JLabel();
+        label3 = new JLabel();
+        progressBar1 = new JProgressBar();
+        infoLabel = new JLabel();
+
+        //======== this ========
+        setTitle("LaTeXtoXML");
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        Container contentPane = getContentPane();
+
+        //======== dialogPane ========
+        {
+            dialogPane.setBorder(new EmptyBorder(12, 12, 12, 12));
+
+            // JFormDesigner evaluation mark
 //			dialogPane.setBorder(new javax.swing.border.CompoundBorder(
 //				new javax.swing.border.TitledBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0),
 //					"JFormDesigner Evaluation", javax.swing.border.TitledBorder.CENTER,
 //					javax.swing.border.TitledBorder.BOTTOM, new java.awt.Font("Dialog", java.awt.Font.BOLD, 12),
 //					java.awt.Color.red), dialogPane.getBorder())); dialogPane.addPropertyChangeListener(new java.beans.PropertyChangeListener(){public void propertyChange(java.beans.PropertyChangeEvent e){if("border".equals(e.getPropertyName()))throw new RuntimeException();}});
 
-			dialogPane.setLayout(new BorderLayout());
 
-			//======== contentPanel ========
-			{
+            //---- cancelButton ----
+            cancelButton.setText("Close");
+            cancelButton.setFont(new Font("Cambria", Font.PLAIN, 14));
+            cancelButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cancelButtonActionPerformed(e);
+                }
+            });
 
-				//---- label1 ----
-				label1.setText("Do you want to upgrade the program?");
-				label1.setFont(new Font("Arial", Font.BOLD, 16));
+            //---- okButton ----
+            okButton.setText("Run program");
+            okButton.setFont(new Font("Cambria", Font.PLAIN, 14));
+            okButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    okButtonActionPerformed(e);
+                }
+            });
 
-				GroupLayout contentPanelLayout = new GroupLayout(contentPanel);
-				contentPanel.setLayout(contentPanelLayout);
-				contentPanelLayout.setHorizontalGroup(
-					contentPanelLayout.createParallelGroup()
-						.addGroup(contentPanelLayout.createSequentialGroup()
-							.addComponent(label1)
-							.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-				);
-				contentPanelLayout.setVerticalGroup(
-					contentPanelLayout.createParallelGroup()
-						.addGroup(contentPanelLayout.createSequentialGroup()
-							.addComponent(label1)
-							.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-				);
-			}
-			dialogPane.add(contentPanel, BorderLayout.CENTER);
+            //---- updateButton ----
+            updateButton.setText("Update");
+            updateButton.setFont(new Font("Cambria", Font.PLAIN, 14));
+            updateButton.setIcon(UIManager.getIcon("OptionPane.informationIcon"));
+            updateButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    updateButtonActionPerformed(e);
+                }
+            });
 
-			//======== buttonBar ========
-			{
-				buttonBar.setBorder(new EmptyBorder(12, 0, 0, 0));
-				buttonBar.setLayout(new GridBagLayout());
-				((GridBagLayout)buttonBar.getLayout()).columnWidths = new int[] {0, 85, 80};
-				((GridBagLayout)buttonBar.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0};
+            //---- label2 ----
+            label2.setText("LaTeXtoXML");
+            label2.setFont(new Font("Baskerville Old Face", Font.PLAIN, 32));
 
-				//---- okButton ----
-				okButton.setText("OK");
-				okButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        okButtonActionPerformed(e);
-                    }
-                });
-				buttonBar.add(okButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+            //---- label3 ----
+            label3.setText("testing version");
+            label3.setFont(new Font("Arial", Font.PLAIN, 14));
 
-				//---- cancelButton ----
-				cancelButton.setText("Cancel");
-				cancelButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        cancelButtonActionPerformed(e);
-                    }
-                });
-				buttonBar.add(cancelButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
-			}
-			dialogPane.add(buttonBar, BorderLayout.SOUTH);
-		}
-		contentPane.add(dialogPane, BorderLayout.CENTER);
-		pack();
-		setLocationRelativeTo(getOwner());
-		// JFormDesigner - End of component initialization  //GEN-END:initComponents
-	}
+            //---- infoLabel ----
+            infoLabel.setText("...");
+            infoLabel.setFont(new Font("Calibri", Font.PLAIN, 14));
 
-	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-	// Generated using JFormDesigner Evaluation license - Vasyl Kutsyk
-	private JPanel dialogPane;
-	private JPanel contentPanel;
-	private JLabel label1;
-	private JPanel buttonBar;
-	private JButton okButton;
-	private JButton cancelButton;
-	// JFormDesigner - End of variables declaration  //GEN-END:variables
+            GroupLayout dialogPaneLayout = new GroupLayout(dialogPane);
+            dialogPane.setLayout(dialogPaneLayout);
+            dialogPaneLayout.setHorizontalGroup(
+                    dialogPaneLayout.createParallelGroup()
+                            .addGroup(dialogPaneLayout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(dialogPaneLayout.createParallelGroup()
+                                            .addComponent(progressBar1, GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
+                                            .addGroup(GroupLayout.Alignment.TRAILING, dialogPaneLayout.createSequentialGroup()
+                                                    .addComponent(infoLabel, GroupLayout.PREFERRED_SIZE, 128, GroupLayout.PREFERRED_SIZE)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(updateButton, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+                                                    .addGap(5, 5, 5)
+                                                    .addComponent(okButton, GroupLayout.PREFERRED_SIZE, 117, GroupLayout.PREFERRED_SIZE)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(cancelButton, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(GroupLayout.Alignment.TRAILING, dialogPaneLayout.createSequentialGroup()
+                                    .addGap(101, 101, 101)
+                                    .addComponent(label2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGap(6, 6, 6)
+                                    .addComponent(label3, GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
+                                    .addGap(99, 99, 99))
+            );
+            dialogPaneLayout.setVerticalGroup(
+                    dialogPaneLayout.createParallelGroup()
+                            .addGroup(GroupLayout.Alignment.TRAILING, dialogPaneLayout.createSequentialGroup()
+                                    .addGroup(dialogPaneLayout.createParallelGroup()
+                                            .addGroup(dialogPaneLayout.createSequentialGroup()
+                                                    .addComponent(label2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .addGap(3, 3, 3))
+                                            .addGroup(dialogPaneLayout.createSequentialGroup()
+                                                    .addGap(3, 3, 3)
+                                                    .addComponent(label3, GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(progressBar1, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(dialogPaneLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(infoLabel)
+                                            .addGroup(dialogPaneLayout.createSequentialGroup()
+                                                    .addGap(1, 1, 1)
+                                                    .addComponent(okButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                            .addGroup(dialogPaneLayout.createSequentialGroup()
+                                                    .addGap(1, 1, 1)
+                                                    .addComponent(cancelButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                            .addComponent(updateButton))
+                                    .addContainerGap())
+            );
+        }
+
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+                contentPaneLayout.createParallelGroup()
+                        .addComponent(dialogPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        contentPaneLayout.setVerticalGroup(
+                contentPaneLayout.createParallelGroup()
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addComponent(dialogPane, GroupLayout.PREFERRED_SIZE, 133, GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pack();
+        setLocationRelativeTo(getOwner());
+        // JFormDesigner - End of component initialization  //GEN-END:initComponents
+    }
+    // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
