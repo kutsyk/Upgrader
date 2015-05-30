@@ -1,5 +1,6 @@
 package com.kutsyk.main;
 
+import com.kutsyk.upgrader.DownloadTask;
 import com.kutsyk.upgrader.Updater;
 
 import javax.swing.*;
@@ -9,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 /*
  * Created by JFormDesigner on Wed May 27 20:41:17 MSD 2015
@@ -18,8 +20,9 @@ import java.io.IOException;
 /**
  * @author Vasyl Kutsyk
  */
-public class MainForm extends JFrame implements PropertyChangeListener{
+public class MainForm extends JFrame implements PropertyChangeListener {
 
+    private final String NEWEST_VERSION = "Newest version";
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     // Generated using JFormDesigner Evaluation license - Vasyl Kutsyk
     private JPanel dialogPane;
@@ -30,26 +33,42 @@ public class MainForm extends JFrame implements PropertyChangeListener{
     private JLabel label3;
     private JProgressBar progressBar1;
     private JLabel infoLabel;
-
     private String userDir = System.getProperty("user.dir");
     private Updater updater;
+    private String server = "ftp.charlesworth-group.com";
+    private int port = 21;
+    private String user = "guest";
+    private String pass = "guest99";
+    private boolean programUpdated = false;
 
     public MainForm() {
         initComponents();
+        updater = new Updater(userDir);
         initUpdatingSystem();
-//        initUpdateButton();
     }
 
-    private void initUpdatingSystem(){
-        updater = new Updater(userDir, progressBar1);
+    private void initUpdatingSystem() {
         infoLabel.setText("Checking for new version...");
-        progressBar1.setIndeterminate(true);
+        updateButton.setEnabled(false);
+        initUpdateButton();
     }
 
-    public void initUpdateButton(){
-        boolean newer = updater.existNewVersion();
-        updateButton.setEnabled(newer);
-        progressBar1.setIndeterminate(false);
+    public void initUpdateButton() {
+        progressBar1.setValue(0);
+        DownloadTask task = new DownloadTask(server, port, user, pass, this);
+        task.setLocal(new File(userDir + "/bin/.version"));
+        task.setRemoteFile("/software/.version");
+        task.addPropertyChangeListener(this);
+        task.execute();
+        while (!task.isDone()) ;
+        if (task.isDone()) {
+            boolean newer = updater.existNewVersion();
+            if (newer) {
+                infoLabel.setText("New version found.");
+                System.out.println("- " + newer);
+                updateButton.setEnabled(newer);
+            } else infoLabel.setText(NEWEST_VERSION);
+        }
     }
 
     private void okButtonActionPerformed(ActionEvent e) {
@@ -66,13 +85,15 @@ public class MainForm extends JFrame implements PropertyChangeListener{
     }
 
     private void updateButtonActionPerformed(ActionEvent e) {
-//        Thread updaterThread = new Thread(new Runnable() {
-//            public void run() {
-                updater.upgrade();
-//            }
-//        });
-//        updaterThread.start();
-        JOptionPane.showMessageDialog(this, "Upgraded. Please, restart the proogram");
+        infoLabel.setText("Updating...");
+        progressBar1.setStringPainted(true);
+        progressBar1.setValue(0);
+        DownloadTask task = new DownloadTask(server, port, user, pass, this);
+        task.setLocal(new File(userDir + "/bin/program.jar"));
+        task.setRemoteFile("/software/program.jar");
+        task.addPropertyChangeListener(this);
+        task.execute();
+        programUpdated = true;
     }
 
     @Override
@@ -80,6 +101,14 @@ public class MainForm extends JFrame implements PropertyChangeListener{
         if ("progress" == evt.getPropertyName()) {
             int progress = (Integer) evt.getNewValue();
             progressBar1.setValue(progress);
+
+            if (programUpdated && progressBar1.getValue() == 100) {
+                programUpdated = false;
+                JOptionPane.showMessageDialog(this, "Upgraded.");
+                infoLabel.setText(NEWEST_VERSION);
+                initUpdateButton();
+                updater.replaceCurrentVersionWithNew();
+            }
         }
     }
 

@@ -19,21 +19,34 @@ public class DownloadTask extends SwingWorker<Void, Void> {
     private String username;
     private String password;
 
-    private String downloadPath;
-    private String saveDir;
+    private String remoteFile;
+    private File local;
 
     private MainForm gui;
 
     public DownloadTask(String host, int port, String username,
-                        String password, String downloadPath, String saveDir,
-                        MainForm gui) {
+                        String password, MainForm gui) {
         this.host = host;
         this.port = port;
         this.username = username;
         this.password = password;
-        this.downloadPath = downloadPath;
-        this.saveDir = saveDir;
         this.gui = gui;
+    }
+
+    public File getLocal() {
+        return local;
+    }
+
+    public void setLocal(File local) {
+        this.local = local;
+    }
+
+    public String getRemoteFile() {
+        return remoteFile;
+    }
+
+    public void setRemoteFile(String remoteFile) {
+        this.remoteFile = remoteFile;
     }
 
     /**
@@ -50,16 +63,10 @@ public class DownloadTask extends SwingWorker<Void, Void> {
             long totalBytesRead = 0;
             int percentCompleted = 0;
 
-            long fileSize = util.getFileSize(downloadPath);
-
-            String fileName = new File(downloadPath).getName();
-
-            File downloadFile = new File(saveDir + File.separator + fileName);
-            FileOutputStream outputStream = new FileOutputStream(downloadFile);
-
-            util.downloadFile(downloadPath);
+            long fileSize = util.getFileSize(remoteFile);
+            FileOutputStream outputStream = new FileOutputStream(local);
+            util.downloadFile(remoteFile);
             InputStream inputStream = util.getInputStream();
-
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, bytesRead);
                 totalBytesRead += bytesRead;
@@ -71,9 +78,6 @@ public class DownloadTask extends SwingWorker<Void, Void> {
 
             util.finish();
         } catch (ConnectException ex) {
-            JOptionPane.showMessageDialog(null,
-                    "Error downloading file: " + ex.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
             setProgress(0);
             cancel(true);
@@ -90,9 +94,6 @@ public class DownloadTask extends SwingWorker<Void, Void> {
     @Override
     protected void done() {
         if (!isCancelled()) {
-            JOptionPane.showMessageDialog(null,
-                    "File has been downloaded successfully!", "Message",
-                    JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }

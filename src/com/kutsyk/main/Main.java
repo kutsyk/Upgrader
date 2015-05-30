@@ -14,9 +14,7 @@ public class Main {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                MainForm mainWindow = new MainForm();
-                mainWindow.setVisible(true);
-                mainWindow.initUpdateButton();
+                new MainForm().setVisible(true);
             }
         });
     }
