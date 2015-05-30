@@ -24,8 +24,9 @@ public class Updater {
     }
 
     public boolean existNewVersion() {
+        currentVersion = getVersionFromFile(mainPath + "/bin/.currVersion");
         versionOnFTP = getVersionFromFile(mainPath + "/bin/.version");
-        return versionOnFTP > currentVersion;
+        return versionOnFTP>currentVersion;
     }
 
     private int getVersionFromFile(String fileName) {
@@ -34,6 +35,7 @@ public class Updater {
             Scanner scanner = new Scanner(new File(fileName));
             while (scanner.hasNextInt())
                 version = scanner.nextInt();
+            scanner.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

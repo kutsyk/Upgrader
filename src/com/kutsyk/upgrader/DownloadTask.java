@@ -57,7 +57,6 @@ public class DownloadTask extends SwingWorker<Void, Void> {
         FTPUtility util = new FTPUtility(host, port, username, password);
         try {
             util.connect();
-
             byte[] buffer = new byte[BUFFER_SIZE];
             int bytesRead = -1;
             long totalBytesRead = 0;

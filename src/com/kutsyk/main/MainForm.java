@@ -61,13 +61,14 @@ public class MainForm extends JFrame implements PropertyChangeListener {
         task.addPropertyChangeListener(this);
         task.execute();
         while (!task.isDone()) ;
+
         if (task.isDone()) {
             boolean newer = updater.existNewVersion();
-            if (newer) {
+            if (newer)
                 infoLabel.setText("New version found.");
-                System.out.println("- " + newer);
-                updateButton.setEnabled(newer);
-            } else infoLabel.setText(NEWEST_VERSION);
+            else
+                infoLabel.setText(NEWEST_VERSION);
+            updateButton.setEnabled(newer);
         }
     }
 
@@ -106,8 +107,8 @@ public class MainForm extends JFrame implements PropertyChangeListener {
                 programUpdated = false;
                 JOptionPane.showMessageDialog(this, "Upgraded.");
                 infoLabel.setText(NEWEST_VERSION);
-                initUpdateButton();
                 updater.replaceCurrentVersionWithNew();
+                initUpdateButton();
             }
         }
     }
