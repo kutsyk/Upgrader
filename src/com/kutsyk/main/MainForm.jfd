@@ -13,11 +13,11 @@
        <class>org.jdesktop.layout.GroupLayout</class> 
        <void method="setProperty"> 
         <string>$horizontalGroup</string> 
-        <string>par l {comp dialogPane::l:::x}</string> 
+        <string>par l {comp panel1::l:::x}</string> 
        </void> 
        <void method="setProperty"> 
         <string>$verticalGroup</string> 
-        <string>par l {seq l {comp dialogPane:::p:133:p, space :::x}}</string> 
+        <string>par l {comp panel1::t:::x}</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -35,26 +35,15 @@
          <class>org.jdesktop.layout.GroupLayout</class> 
          <void method="setProperty"> 
           <string>$horizontalGroup</string> 
-          <string>par l {seq {space :p::p, par l {comp progressBar::l::478:x, seq t {comp infoLabel:::p:128:p, space :::p, comp updateButton:::p:138:p, space :p:5:p, comp okButton:::p:117:p, space :::p, comp cancelButton:::p:80:p}}}, seq t {space :p:101:p, comp label2:::::x, space :p:6:p, comp label3::::92:x, space :p:99:p}}</string> 
+          <string>par l {seq l {space :::p, par l {seq {space :103:103:103, comp label2:::p:192:p, space :6:6:6, comp label3:::p:95:p}, comp progressBar:::p:483:p, seq {comp infoLabel:::p:142:p, space :10:10:10, comp updateButton:::p:129:p, space :6:6:6, comp okButton:::p:114:p, space :10:10:10, comp cancelButton:::p:72:p}}, space ::14:x}}</string> 
          </void> 
          <void method="setProperty"> 
           <string>$verticalGroup</string> 
-          <string>par l {seq t {par l {seq l {comp label2:::::x, space :3:3:3}, seq l {space :p:3:p, comp label3::::32:x}}, space :::p, comp progressBar:::p:32:p, space :p::p, par l:::p {comp infoLabel:::p::p, seq l:::1 {space :p:1:p, comp okButton:::::x}, seq l:::1 {space :p:1:p, comp cancelButton:::::x}, comp updateButton::l:p::p}, space :p::p}}</string> 
+          <string>par l {seq l {space :p::p, par l {comp label2:::p::p, seq {space :3:3:3, comp label3:::p:32:p}}, space :5:5:5, comp progressBar:::p:23:p, space :12:12:12, par l {seq {space :12:12:12, comp infoLabel:::p:18:p}, comp updateButton:::p::p, comp okButton:::p:40:p, comp cancelButton:::p:41:p}, space ::16:x}}</string> 
          </void> 
         </object> 
-        <void method="setProperty"> 
-         <string>border</string> 
-         <object class="javax.swing.border.EmptyBorder"> 
-          <object class="java.awt.Insets"> 
-           <int>12</int> 
-           <int>12</int> 
-           <int>12</int> 
-           <int>12</int> 
-          </object> 
-         </object> 
-        </void> 
         <void property="name"> 
-         <string>dialogPane</string> 
+         <string>panel1</string> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
@@ -233,8 +222,8 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>520</int> 
-        <int>160</int> 
+        <int>515</int> 
+        <int>170</int> 
        </object> 
       </void> 
      </object> 
